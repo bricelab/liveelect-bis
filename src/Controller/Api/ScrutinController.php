@@ -63,12 +63,12 @@ class ScrutinController extends AbstractController
             throw new BadInputException('Les résultats de cet arrondissement ont déjà été remontés !');
         }
 
-        $inscrits = intval($payload['inscrits']);
-        $votants = intval($payload['votants']);
-        $nuls = intval($payload['nuls']);
+        $inscrits = intval($payload['inscrits'] ?? '0');
+        $votants = intval($payload['votants'] ?? '0');
+        $nuls = intval($payload['nuls'] ?? '0');
         $suffrages = $payload['suffrages'];
 
-        if (!$inscrits || !$votants || !$nuls || !is_array($suffrages)) {
+        if (!is_array($suffrages)) {
             throw new BadRequestException('Les résultats sont erronés');
         }
 
