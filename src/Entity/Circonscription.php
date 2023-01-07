@@ -22,7 +22,10 @@ class Circonscription
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
-    #[ORM\OneToMany(mappedBy: 'circonscription', targetEntity: Arrondissement::class)]
+    #[ORM\ManyToMany(targetEntity: Arrondissement::class)]
+    #[ORM\JoinTable(name: 'circonscription_arrondissement')]
+    #[ORM\JoinColumn(name: 'circonscription_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'arrondissement_id', referencedColumnName: 'id', unique: true)]
     private Collection $arrondissements;
 
     public function __construct()
@@ -59,7 +62,6 @@ class Circonscription
     {
         if (!$this->arrondissements->contains($arrondissement)) {
             $this->arrondissements->add($arrondissement);
-            $arrondissement->setCirconscription($this);
         }
 
         return $this;
@@ -67,12 +69,7 @@ class Circonscription
 
     public function removeArrondissement(Arrondissement $arrondissement): self
     {
-        if ($this->arrondissements->removeElement($arrondissement)) {
-            // set the owning side to null (unless already changed)
-            if ($arrondissement->getCirconscription() === $this) {
-                $arrondissement->setCirconscription(null);
-            }
-        }
+        $this->arrondissements->removeElement($arrondissement);
 
         return $this;
     }

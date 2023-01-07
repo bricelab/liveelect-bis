@@ -31,7 +31,7 @@ class Scrutin implements \Stringable
     #[Groups(['read:Scrutin:Data'])]
     private ?int $year = null;
 
-    #[ORM\Column(type: TypeScrutinType::NAME)]
+    #[ORM\Column(name: 'scrutin_type', type: TypeScrutinType::NAME)]
     #[Groups(['read:Scrutin:Data'])]
     private ?TypeScrutin $type = null;
 

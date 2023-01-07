@@ -16,7 +16,7 @@ final class EasyAdminSubscriber implements EventSubscriberInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeEntityPersistedEvent::class => ['setScrutinPublishedAtBeforePersist'],
@@ -26,24 +26,24 @@ final class EasyAdminSubscriber implements EventSubscriberInterface
 
     public function setScrutinPublishedAtBeforePersist(BeforeEntityPersistedEvent $event): void
     {
-        $scrutin = $event->getEntityInstance();
+        $entity = $event->getEntityInstance();
 
-        if ($scrutin instanceof Scrutin) {
-            if ($scrutin->isPublished()) {
-                $scrutin->setPublishedAt(new DateTimeImmutable());
+        if ($entity instanceof Scrutin) {
+            if ($entity->isPublished()) {
+                $entity->setPublishedAt(new DateTimeImmutable());
             }
         }
     }
 
     public function setScrutinPublishedAtBeforeUpdate(BeforeEntityUpdatedEvent $event): void
     {
-        $scrutin = $event->getEntityInstance();
+        $entity = $event->getEntityInstance();
 
-        if ($scrutin instanceof Scrutin) {
-            if ($scrutin->isPublished()) {
-                $scrutin->setPublishedAt(new DateTimeImmutable());
+        if ($entity instanceof Scrutin) {
+            if ($entity->isPublished()) {
+                $entity->setPublishedAt(new DateTimeImmutable());
             } else {
-                $scrutin->setPublishedAt(null);
+                $entity->setPublishedAt(null);
             }
         }
     }

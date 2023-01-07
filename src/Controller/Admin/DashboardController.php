@@ -7,13 +7,11 @@ use App\Entity\Candidat;
 use App\Entity\Circonscription;
 use App\Entity\Commune;
 use App\Entity\Departement;
-use App\Entity\IncidentSignale;
-use App\Entity\RapportOuverture;
 use App\Entity\Scrutin;
-use App\Entity\Utilisateur;
 use App\Repository\ArrondissementRepository;
 use App\Repository\DepartementRepository;
-use App\Repository\IncidentSignaleRepository;
+use App\Repository\ResultatParArrondissementRepository;
+use App\Repository\SuffragesObtenusRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -23,27 +21,60 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
+#[Route('/admin', name: 'admin_')]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-//        private DecoderInterface $decoder,
-//        private ChartBuilderInterface $chartBuilder,
-        private readonly DepartementRepository $departementRepository,
-        private readonly ArrondissementRepository $arrondissementRepository,
-//        private IncidentSignaleRepository $incidentSignaleRepository,
+        private readonly DecoderInterface $decoder,
+        private readonly EncoderInterface $encoder,
+        private readonly ResultatParArrondissementRepository $resultatParArrondissementRepository,
+        private readonly SuffragesObtenusRepository $suffragesObtenusRepository,
         private readonly AdminUrlGenerator $adminUrlGenerator,
     ) {
     }
 
-    #[Route('/admin', name: 'admin')]
+    #[Route('/', name: 'index')]
     public function index(): Response
     {
         return $this->render('admin/dashboard.html.twig', [
 //            'rapportOuvertureGraphe' => $this->buildRapportOuvertureGraphe(),
         ]);
+    }
+
+    #[Route('/export-results', name: 'export_results')]
+    public function exportResults(): Response
+    {
+        $results = $this->resultatParArrondissementRepository->findBy([]);
+        $data = [];
+        $cpt = 1;
+
+        foreach ($results as $result) {
+            $suffrages = $this->suffragesObtenusRepository->findBy(['resultatParArrondissement' => $result]);
+            $suffrageData = [];
+            foreach ($suffrages as $suffrage) {
+                $suffrageData[$suffrage->getCandidat()->getSigle()] = $suffrage->getNbVoix();
+            }
+
+            $data[] = array_merge([
+                '#' => $cpt++,
+                'Département' => $result->getArrondissement()->getCommune()->getDepartement()->getNom(),
+                'Commune' => $result->getArrondissement()->getCommune()->getNom(),
+                'Arrondissement' => $result->getArrondissement()->getNom(),
+                'Inscrits' => $result->getNbInscrits(),
+                'Votants' => $result->getNbVotants(),
+                'Bulletins nuls' => $result->getNbBulletinsNuls(),
+            ], $suffrageData);
+        }
+
+        $filename = 'export_resultats_scrutin.csv';
+
+        file_put_contents($filename, $this->encoder->encode($data, 'csv', [CsvEncoder::DELIMITER_KEY => ';']));
+
+        return $this->file($filename);
     }
 
     public function configureDashboard(): Dashboard
@@ -60,26 +91,28 @@ class DashboardController extends AbstractDashboardController
         ;
     }
 
-   /* public function configureActions(): Actions
+   public function configureActions(): Actions
     {
         return Actions::new()
-//            ->addBatchAction(Action::BATCH_DELETE)
-//            ->add(Crud::PAGE_INDEX, Action::NEW)
-//            ->add(Crud::PAGE_INDEX, Action::EDIT)
-//            ->add(Crud::PAGE_INDEX, Action::DELETE)
+            ->addBatchAction(Action::BATCH_DELETE)
+            ->add(Crud::PAGE_INDEX, Action::NEW)
+            ->add(Crud::PAGE_INDEX, Action::EDIT)
+            ->add(Crud::PAGE_INDEX, Action::DELETE)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
 
-//            ->add(Crud::PAGE_DETAIL, Action::EDIT)
+            ->add(Crud::PAGE_DETAIL, Action::EDIT)
             ->add(Crud::PAGE_DETAIL, Action::INDEX)
-//            ->add(Crud::PAGE_DETAIL, Action::DELETE)
+            ->add(Crud::PAGE_DETAIL, Action::DELETE)
 
             ->add(Crud::PAGE_EDIT, Action::SAVE_AND_RETURN)
             ->add(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
+            ->add(Crud::PAGE_EDIT, Action::INDEX)
 
             ->add(Crud::PAGE_NEW, Action::SAVE_AND_RETURN)
             ->add(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
+            ->add(Crud::PAGE_NEW, Action::INDEX)
         ;
-    }*/
+    }
 
     public function configureMenuItems(): iterable
     {

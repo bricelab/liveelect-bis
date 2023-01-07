@@ -42,9 +42,6 @@ class Arrondissement
     #[Groups(['read:Scrutin:Data'])]
     private ?Commune $commune = null;
 
-    #[ORM\ManyToOne(inversedBy: 'arrondissements')]
-    private ?Circonscription $circonscription = null;
-
     public function __toString(): string
     {
         return $this->getDisplayName();
@@ -95,18 +92,6 @@ class Arrondissement
     public function getCommuneUri(): string
     {
         return '/api/communes/' . $this->commune->getId();
-    }
-
-    public function getCirconscription(): ?Circonscription
-    {
-        return $this->circonscription;
-    }
-
-    public function setCirconscription(?Circonscription $circonscription): self
-    {
-        $this->circonscription = $circonscription;
-
-        return $this;
     }
 
     public function getDisplayName(): ?string
