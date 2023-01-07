@@ -4,10 +4,8 @@ namespace App\Controller\Api;
 
 use App\Entity\Arrondissement;
 use App\Entity\ResultatParArrondissement;
-use App\Entity\Scrutin;
 use App\Entity\SuffragesObtenus;
 use App\Entity\SuperviseurArrondissement;
-use App\Exception\ArrondissementNotFoundException;
 use App\Exception\BadInputException;
 use App\Repository\ArrondissementRepository;
 use App\Repository\CandidatRepository;
@@ -25,7 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class ScrutinController extends AbstractController
 {
     public function __construct(
-        private readonly ScrutinRepository $scrutinRepository,
         private readonly CandidatRepository $candidatRepository,
         private readonly DepartementRepository $departementRepository,
         private readonly CommuneRepository $communeRepository,
