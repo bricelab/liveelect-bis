@@ -3,12 +3,19 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    role_hierarchy:
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
     providers:
         # used to reload user from session & other features (e.g. switch_user)
+        admin_user_provider:
+            entity:
+                class: App\Entity\AdminUser
+                property: email
         app_user_provider:
             entity:
                 class: App\Entity\SuperviseurArrondissement
                 property: telephone
+        # used to reload user from session & other features (e.g. switch_user)
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -16,10 +23,13 @@ security:
         admin:
             pattern: ^/admin
             lazy: true
-            provider: app_user_provider
-            custom_authenticator: App\Security\SuperviseurAuthenticator
+            provider: admin_user_provider
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
             logout:
-                path: app_logout
+                path: admin_logout
+                target: admin_login
         main:
             lazy: true
             provider: app_user_provider
@@ -38,8 +48,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/login, roles: PUBLIC_ACCESS }
-         - { path: ^/admin, roles: PUBLIC_ACCESS }
-#         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+         - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/, roles: ROLE_SUPERVISEUR_ARRONDISSEMENT }
         # - { path: ^/profile, roles: ROLE_USER }
 

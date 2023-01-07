@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Repository\UtilisateurRepository;
+use App\Repository\AdminUserRepository;
 use App\Service\CreateNewUserAccount;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,18 +15,18 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validation;
 
 #[AsCommand(
-    name: 'app:create-user',
+    name: 'app:create-super-admin-user',
     description: 'Add a short description for your command',
 )]
-class CreateUserCommand extends Command
+class CreateSuperAdminUserCommand extends Command
 {
-//    public function __construct(
-//        private readonly CreateNewUserAccount $createNewUserAccount,
-//        private readonly UtilisateurRepository $repository,
-//        string $name = null
-//    ) {
-//        parent::__construct($name);
-//    }
+    public function __construct(
+        private readonly CreateNewUserAccount $createNewUserAccount,
+        private readonly AdminUserRepository  $adminUserRepository,
+        string $name = null
+    ) {
+        parent::__construct($name);
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -60,15 +60,7 @@ class CreateUserCommand extends Command
             return $this->validatePassword($answer);
         });
 
-        $isAdmin = false;
-        $isSuperAdmin = $io->confirm('Super administrateur ? ');
-
-        if (!$isSuperAdmin) {
-            $isAdmin = $io->confirm('Administrateur ? ');
-        }
-
-        $roles = $isSuperAdmin ? ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'] : ($isAdmin ? ['ROLE_ADMIN'] : []);
-        $roles[] = 'ROLE_USER';
+        $roles = ['ROLE_SUPER_ADMIN'];
 
         $user = $this->createNewUserAccount->create($email, $password, $roles, $lastname, $firstname);
 
@@ -94,7 +86,7 @@ class CreateUserCommand extends Command
             throw new RuntimeException('Entrer une adresse mail valide.');
         }
 
-        $doublon = $this->repository->findOneBy(['email' => $answer]);
+        $doublon = $this->adminUserRepository->findOneBy(['email' => $answer]);
 
         if ($doublon) {
             throw new RuntimeException('Email déjà utilisé par un autre utilisateur.');

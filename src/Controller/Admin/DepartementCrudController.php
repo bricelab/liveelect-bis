@@ -26,9 +26,20 @@ class DepartementCrudController extends AbstractCrudController
         ;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::BATCH_DELETE, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
+            ->remove(Crud::PAGE_INDEX, Action::DETAIL)
+        ;
+    }
+
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id', 'Identifiant')->onlyOnDetail();
+        yield IdField::new('id', 'ID')->hideOnForm();
         yield TextField::new('nom', 'Nom');
     }
 

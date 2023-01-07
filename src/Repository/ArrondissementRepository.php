@@ -38,10 +38,10 @@ class ArrondissementRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    public function countAllByDepartement()
+    public function countAllByDepartement(): array
     {
-        return $this->createQueryBuilder('a')
-            ->select('d.nom', 'count(a.id)')
+        $result = $this->createQueryBuilder('a')
+            ->select('d.nom', 'count(a.id) as nb_arr')
             ->join('a.commune', 'c')
             ->join('c.departement', 'd')
             ->groupBy('d.id')
@@ -49,20 +49,36 @@ class ArrondissementRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+
+        $data = [];
+
+        foreach ($result as $value) {
+            $data[$value['nom']] = $value['nb_arr'];
+        }
+
+        return $data;
     }
 
-    public function countAllRemontedByDepartement()
+    public function countAllRemontesByDepartement(): array
     {
-        return $this->createQueryBuilder('a')
-            ->select('d.nom', 'count(a.id)')
+        $result = $this->createQueryBuilder('a')
+            ->select('d.nom', 'count(a.id) as nb_arr')
             ->join('a.commune', 'c')
             ->join('c.departement', 'd')
-            ->andWhere('a.rapportOuvertureRempli = true')
+            ->andWhere('a.estRemonte = true')
             ->groupBy('d.id')
             ->orderBy('d.id', 'ASC')
             ->getQuery()
             ->getResult()
             ;
+
+        $data = [];
+
+        foreach ($result as $value) {
+            $data[$value['nom']] = $value['nb_arr'];
+        }
+
+        return $data;
     }
 
 //    /**

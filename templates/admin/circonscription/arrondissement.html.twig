@@ -1,0 +1,18 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{# this is a bit ugly, but Twig doesn't have a 'is numeric' test #}
+{% if ea.crud.currentAction == 'detail' %}
+    {% for arrondissement in field.value %}
+        <span class="badge badge-success">
+            {{ arrondissement.displayName }}
+        </span>
+    {% endfor %}
+{% else %}
+    {% if field.formattedValue matches '/^\\d+$/' %}
+        <span class="badge badge-secondary">{{ field.formattedValue }}</span>
+    {% else %}
+        {{ field.formattedValue }}
+    {% endif %}
+{% endif %}
+
