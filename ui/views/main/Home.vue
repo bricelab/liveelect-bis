@@ -206,9 +206,11 @@ const validate = async () => {
       alertStore.title = 'Succès'
       alertStore.message = 'Informations soumises avec succès !'
     } catch (e) {
+      // console.log(e.response.data.content)
       alertStore.type = 'error'
       alertStore.title = 'Erreur'
-      alertStore.message = `${e.response.data.detail}. Veuillez vérifier svp !`
+      alertStore.message = `${e.response.data.content}. Veuillez vérifier svp !`
+      window.scrollTo(0, 0);
     }
     alertStore.show = true
     loading.value = false
