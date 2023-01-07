@@ -11,7 +11,6 @@ use App\Repository\ArrondissementRepository;
 use App\Repository\CandidatRepository;
 use App\Repository\CommuneRepository;
 use App\Repository\DepartementRepository;
-use App\Repository\ScrutinRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
