@@ -8,34 +8,19 @@ use App\Entity\Circonscription;
 use App\Entity\Commune;
 use App\Entity\Departement;
 use App\Entity\Scrutin;
-use App\Repository\ArrondissementRepository;
-use App\Repository\DepartementRepository;
-use App\Repository\ResultatParArrondissementRepository;
-use App\Repository\SuffragesObtenusRepository;
+use App\Entity\SuperviseurArrondissement;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\CsvEncoder;
-use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 #[Route('/admin', name: 'admin_')]
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct(
-        private readonly DecoderInterface $decoder,
-        private readonly EncoderInterface $encoder,
-        private readonly ResultatParArrondissementRepository $resultatParArrondissementRepository,
-        private readonly SuffragesObtenusRepository $suffragesObtenusRepository,
-        private readonly AdminUrlGenerator $adminUrlGenerator,
-    ) {
-    }
 
     #[Route('/', name: 'index')]
     public function index(): Response
@@ -45,37 +30,7 @@ class DashboardController extends AbstractDashboardController
         ]);
     }
 
-    #[Route('/export-results', name: 'export_results')]
-    public function exportResults(): Response
-    {
-        $results = $this->resultatParArrondissementRepository->findBy([]);
-        $data = [];
-        $cpt = 1;
 
-        foreach ($results as $result) {
-            $suffrages = $this->suffragesObtenusRepository->findBy(['resultatParArrondissement' => $result]);
-            $suffrageData = [];
-            foreach ($suffrages as $suffrage) {
-                $suffrageData[$suffrage->getCandidat()->getSigle()] = $suffrage->getNbVoix();
-            }
-
-            $data[] = array_merge([
-                '#' => $cpt++,
-                'Département' => $result->getArrondissement()->getCommune()->getDepartement()->getNom(),
-                'Commune' => $result->getArrondissement()->getCommune()->getNom(),
-                'Arrondissement' => $result->getArrondissement()->getNom(),
-                'Inscrits' => $result->getNbInscrits(),
-                'Votants' => $result->getNbVotants(),
-                'Bulletins nuls' => $result->getNbBulletinsNuls(),
-            ], $suffrageData);
-        }
-
-        $filename = 'export_resultats_scrutin.csv';
-
-        file_put_contents($filename, $this->encoder->encode($data, 'csv', [CsvEncoder::DELIMITER_KEY => ';']));
-
-        return $this->file($filename);
-    }
 
     public function configureDashboard(): Dashboard
     {
@@ -126,7 +81,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Données du scrutin');
         yield MenuItem::linkToCrud('Scrutins', 'fas fa-list', Scrutin::class);
         yield MenuItem::linkToCrud('Candidats', 'fas fa-list', Candidat::class);
-//        yield MenuItem::linkToCrud('Rapports d\'ouverture', 'fas fa-list', RapportOuverture::class);
+        yield MenuItem::linkToCrud('Superviseurs', 'fas fa-list', SuperviseurArrondissement::class);
 //        yield MenuItem::linkToCrud('Incidents signalés', 'fas fa-list', IncidentSignale::class);
 
         yield MenuItem::section('Administration');
