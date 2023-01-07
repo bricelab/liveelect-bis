@@ -12,6 +12,11 @@
           </h3>
         </v-col>
         <v-col cols="12">
+          <h1 class="text-h3 text-green mt-5 mb-2">
+            Bienvenue {{ scrutinStore.fullName }}
+          </h1>
+        </v-col>
+        <v-col cols="12">
           <div class="text-h5 text-green">
             Remontée des résultats
           </div>
@@ -194,7 +199,6 @@ const validate = async () => {
   if (valid.value) {
     try {
       await remonterResultatsParArrondissement({
-        scrutin: scrutinStore.scrutinId,
         arrondissement: arrondissement.value,
         inscrits: inscrits.value,
         votants: votants.value,

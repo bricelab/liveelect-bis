@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ parent() }} | Connexion{% endblock %}
+
+{% block body %}
+    <div {{ stimulus_controller('main-vue-login') }}></div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.csrfToken = "{{ csrf_token('authenticate') }}"
+        {% if error %}
+        window.error = "{{ error.messageKey|trans(error.messageData, 'security') }}"
+        {% endif %}
+    </script>
+
+    {{ parent() }}
+{% endblock %}

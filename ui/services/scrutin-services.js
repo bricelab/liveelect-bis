@@ -42,7 +42,16 @@ import {axios} from '@/modules/axios/axios'
  */
 
 /**
+ * @typedef {Object} Superviseur
+ * @property {Number} id ID du superviseur
+ * @property {string} nom Nom du superviseur
+ * @property {string} prenoms Prénoms du superviseur
+ * @property {string} telephone Numéro de téléphone du superviseur
+ */
+
+/**
  * @typedef {Object} ScrutinData
+ * @property {Superviseur} superviseur
  * @property {Scrutin} scrutin
  * @property {Candidat[]} candidats Nom du candidat
  * @property {Departement[]} departements Sigle du candidat
@@ -63,13 +72,13 @@ import {axios} from '@/modules/axios/axios'
 /**
  * Permet de récupérer les données du scrutin
  *
- * @param {Number} scrutinId ID du scrutin
  * @return {Promise<ScrutinData>}
  */
-export function fetchScrutinData(scrutinId) {
-    return axios.get(`/api/scrutin/${scrutinId}/data`)
+export function fetchScrutinData() {
+    return axios.get('/api/scrutin/data')
         .then((response) => {
             return {
+                superviseur: response.data.superviseur,
                 scrutin: response.data.scrutin,
                 candidats: response.data.candidats,
                 departements: response.data.departements,
@@ -85,8 +94,8 @@ export function fetchScrutinData(scrutinId) {
  * @param {Resultat} result
  * @return {Promise<Object>}
  */
-export function remonterResultatsParArrondissement({scrutin, arrondissement, inscrits, votants, nuls, suffrages}) {
-    return axios.post(`/api/scrutin/${scrutin}/resultats/remonter-par-arrondissement`, {
+export function remonterResultatsParArrondissement({arrondissement, inscrits, votants, nuls, suffrages}) {
+    return axios.post('/api/scrutin/resultats/remonter-par-arrondissement', {
         arrondissement,
         inscrits,
         votants,

@@ -6,6 +6,7 @@ use App\Entity\Arrondissement;
 use App\Entity\ResultatParArrondissement;
 use App\Entity\Scrutin;
 use App\Entity\SuffragesObtenus;
+use App\Entity\SuperviseurArrondissement;
 use App\Exception\ArrondissementNotFoundException;
 use App\Exception\BadInputException;
 use App\Repository\ArrondissementRepository;
@@ -32,11 +33,19 @@ class ScrutinController extends AbstractController
     ) {
     }
 
-    #[Route('/{id}/data', name: 'data', methods: Request::METHOD_GET)]
-    public function data(Scrutin $scrutin): Response
+    #[Route('/data', name: 'data', methods: Request::METHOD_GET)]
+    public function data(): Response
     {
+        $superviseur = $this->getUser();
+
+        if (!$superviseur instanceof SuperviseurArrondissement) {
+            throw $this->createAccessDeniedException();
+        }
+        $scrutin = $superviseur->getScrutin();
+
         return $this->json(
             [
+                'superviseur' => $superviseur,
                 'scrutin' => $scrutin,
                 'candidats' => $this->candidatRepository->findBy(['scrutin' => $scrutin]),
                 'departements' => $this->departementRepository->findBy([]),
@@ -49,9 +58,16 @@ class ScrutinController extends AbstractController
         );
     }
 
-    #[Route('/{id}/resultats/remonter-par-arrondissement', name: 'remonter_resultats', methods: Request::METHOD_POST)]
-    public function remonterResultatsParArrondissement(Request $request, Scrutin $scrutin, EntityManagerInterface $entityManager): Response
+    #[Route('/resultats/remonter-par-arrondissement', name: 'remonter_resultats', methods: Request::METHOD_POST)]
+    public function remonterResultatsParArrondissement(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $superviseur = $this->getUser();
+
+        if (!$superviseur instanceof SuperviseurArrondissement) {
+            throw $this->createAccessDeniedException();
+        }
+        $scrutin = $superviseur->getScrutin();
+
         $payload = json_decode($request->getContent(), true);
 
         $arrondissement = $this->arrondissementRepository->find(intval($payload['arrondissement'] ?? ''));
@@ -68,7 +84,7 @@ class ScrutinController extends AbstractController
         $nuls = intval($payload['nuls'] ?? '0');
         $suffrages = $payload['suffrages'];
 
-        if (!is_array($suffrages)) {
+        if ($inscrits < 0 || $votants < 0 || $nuls < 0 || !is_array($suffrages)) {
             throw new BadRequestException('Les résultats sont erronés');
         }
 
@@ -94,11 +110,18 @@ class ScrutinController extends AbstractController
         $entityManager->persist($donneesRemontees);
 
         foreach ($candidats as $candidat) {
+            $nbVoix = $suffrages[$candidat->getId()];
+
+            if ($nbVoix < 0) {
+                throw new BadRequestException('Les résultats sont erronés');
+            }
+
             $suffrage = new SuffragesObtenus();
+
             $suffrage
                 ->setCandidat($candidat)
                 ->setNbVoix(
-                    intval($suffrages[$candidat->getId()])
+                    intval($nbVoix)
                 )
             ;
 

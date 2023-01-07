@@ -6,6 +6,7 @@ use App\Repository\SuperviseurArrondissementRepository;
 use Bricelab\Doctrine\TimestampSetter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SuperviseurArrondissementRepository::class)]
 #[ORM\UniqueConstraint(fields: ['telephone'])]
@@ -17,18 +18,22 @@ class SuperviseurArrondissement implements UserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:Scrutin:Data'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['read:Scrutin:Data'])]
     private ?string $telephone = null;
 
     #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:Scrutin:Data'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:Scrutin:Data'])]
     private ?string $prenoms = null;
 
     #[ORM\ManyToOne]

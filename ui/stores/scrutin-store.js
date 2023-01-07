@@ -4,7 +4,7 @@ import {fetchScrutinData} from '@/services/scrutin-services'
 export const useScrutinStore = defineStore('scrutin-store', {
     state: () => {
         return {
-            scrutinId: 1,
+            superviseur: {},
             scrutin: {},
             candidats: [],
             departements: [],
@@ -14,6 +14,9 @@ export const useScrutinStore = defineStore('scrutin-store', {
         }
     },
     getters: {
+        fullName() {
+            return this.superviseur.prenoms + ' ' + this.superviseur.nom
+        },
         sortedCandidats() {
             return this.candidats.sort((a, b) => {
                 if (a.position < b.position) {
@@ -30,8 +33,9 @@ export const useScrutinStore = defineStore('scrutin-store', {
         async initialize() {
             this.isInitialized = false
 
-            const data = await fetchScrutinData(this.scrutinId)
+            const data = await fetchScrutinData()
 
+            this.superviseur = data.superviseur
             this.scrutin = data.scrutin
             this.candidats = data.candidats
             this.departements = data.departements
