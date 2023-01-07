@@ -1,7 +1,7 @@
 <template>
   <v-app theme="light">
 
-    <AppTopBar :is-connected-user-page="false" />
+    <AppTopBar :is-connected-user-page="true" />
 
     <v-main>
       <LoadingPage v-if="!scrutinStore.isInitialized" />
