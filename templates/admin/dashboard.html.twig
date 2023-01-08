@@ -111,7 +111,7 @@
                                     <img class="mr-3" src="/uploads/candidats/logos/{{ item.logo }}" alt="{{ item.sigle }}" width="25">
                                     {{ item.sigle }}
                                 </td>
-                                <td class="text-center fw-bold">{{ item.suffrages_obtenus }}</td>
+                                <td class="text-center fw-bold p-3">{{ (item.suffrages_obtenus * 100/suffrages_exprimes_national)|number_format(2, ',', ' ') }}%</td>
                             </tr>
                         {% endfor %}
                         </tbody>

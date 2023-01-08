@@ -40,7 +40,7 @@ class DashboardController extends AbstractDashboardController
     {
         $circonscriptions = $this->circonscriptionRepository->findBy([], ['nom' => 'ASC']);
         $circonscriptionsData = [];
-//        $suffragesNational = $this->suffragesObtenusRepository->suffragesExprimesNational();
+        $suffragesNational = $this->suffragesObtenusRepository->suffragesExprimesNational();
         foreach ($circonscriptions as $circonscription) {
 //            dump($circonscription, $this->calculerNbSieges($circonscription, $suffragesNational));
 //            ($this->calculerNbSieges($circonscription, $suffragesNational));
@@ -63,6 +63,7 @@ class DashboardController extends AbstractDashboardController
             'arrondissements_restants' => $this->arrondissementRepository->count(['estRemonte' => false]),
             'arrondissements_remontes' => $this->arrondissementRepository->count(['estRemonte' => true]),
             'suffrages_obtenus' => $this->suffragesObtenusRepository->suffragesObtenusParCandidat(),
+            'suffrages_exprimes_national' => $suffragesNational,
         ]);
     }
 
