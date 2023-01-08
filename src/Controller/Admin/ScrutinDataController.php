@@ -24,6 +24,14 @@ class ScrutinDataController extends AbstractController
         return $this->file($filename);
     }
 
+    #[Route('/export-results-par-ce', name: 'export_results_par_ce')]
+    public function exportResultsParCE(): Response
+    {
+        $filename = $this->scrutinDataService->exportParCE();
+
+        return $this->file($filename);
+    }
+
     #[Route('/purge-results', name: 'purge_results')]
     public function purgeResults(): Response
     {
