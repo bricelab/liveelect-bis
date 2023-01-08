@@ -101,17 +101,17 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-tachometer');
 
-        yield MenuItem::section('Données du scrutin');
+        yield MenuItem::section('Données du scrutin')->setPermission('ROLE_ADMIN');
         yield MenuItem::linkToCrud('Scrutins', 'fas fa-list', Scrutin::class)->setPermission('ROLE_SUPER_ADMIN');
-        yield MenuItem::linkToCrud('Candidats', 'fas fa-list', Candidat::class);
-        yield MenuItem::linkToCrud('Superviseurs', 'fas fa-list', SuperviseurArrondissement::class);
+        yield MenuItem::linkToCrud('Candidats', 'fas fa-list', Candidat::class)->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Superviseurs', 'fas fa-list', SuperviseurArrondissement::class)->setPermission('ROLE_ADMIN');
 
-        yield MenuItem::section('Administration');
-        yield MenuItem::linkToCrud('Départements', 'fas fa-list', Departement::class);
-        yield MenuItem::linkToCrud('Communes', 'fas fa-list', Commune::class);
-        yield MenuItem::linkToCrud('Arrondissements', 'fas fa-list', Arrondissement::class);
-        yield MenuItem::linkToCrud('Circonscriptions', 'fas fa-list', Circonscription::class);
-        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', AdminUser::class)->setPermission('ROLE_SUPER_ADMIN');
+        yield MenuItem::section('Administration')->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Départements', 'fas fa-list', Departement::class)->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Communes', 'fas fa-list', Commune::class)->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Arrondissements', 'fas fa-list', Arrondissement::class)->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Circonscriptions', 'fas fa-list', Circonscription::class)->setPermission('ROLE_ADMIN');
+        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', AdminUser::class)->setPermission('ROLE_SUPER_ADMIN')->setPermission('ROLE_ADMIN');
     }
 
     public function configureAssets(): Assets

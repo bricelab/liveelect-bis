@@ -5,6 +5,7 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     role_hierarchy:
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
+        ROLE_ADMIN: [ ROLE_USER ]
     providers:
         # used to reload user from session & other features (e.g. switch_user)
         admin_user_provider:
@@ -49,7 +50,8 @@ security:
     access_control:
          - { path: ^/login, roles: PUBLIC_ACCESS }
          - { path: ^/admin/login, roles: PUBLIC_ACCESS }
-         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_USER }
+#         - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/, roles: ROLE_SUPERVISEUR_ARRONDISSEMENT }
         # - { path: ^/profile, roles: ROLE_USER }
 
