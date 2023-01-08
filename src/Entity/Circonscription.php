@@ -28,6 +28,9 @@ class Circonscription
     #[ORM\InverseJoinColumn(name: 'arrondissement_id', referencedColumnName: 'id', unique: true)]
     private Collection $arrondissements;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private ?int $siege = 0;
+
     public function __construct()
     {
         $this->arrondissements = new ArrayCollection();
@@ -70,6 +73,18 @@ class Circonscription
     public function removeArrondissement(Arrondissement $arrondissement): self
     {
         $this->arrondissements->removeElement($arrondissement);
+
+        return $this;
+    }
+
+    public function getSiege(): ?int
+    {
+        return $this->siege;
+    }
+
+    public function setSiege(int $siege): self
+    {
+        $this->siege = $siege;
 
         return $this;
     }

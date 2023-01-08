@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class CirconscriptionCrudController extends AbstractCrudController
@@ -41,6 +42,7 @@ class CirconscriptionCrudController extends AbstractCrudController
     {
         yield IdField::new('id', 'Identifiant')->onlyOnDetail();
         yield TextField::new('nom', 'Nom');
+        yield IntegerField::new('siege', 'Nombre de sièges');
         yield AssociationField::new('arrondissements', 'Arrondissements')
             ->setTemplatePath('admin/circonscription/arrondissement.html.twig');
     }
@@ -49,6 +51,7 @@ class CirconscriptionCrudController extends AbstractCrudController
     {
         return $filters
             ->add('nom')
+            ->add('siege')
             ->add('arrondissements')
         ;
     }

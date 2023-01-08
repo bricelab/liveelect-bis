@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Arrondissement;
 use App\Entity\ResultatParArrondissement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,6 +38,48 @@ class ResultatParArrondissementRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function tauxParticipationNational(?Arrondissement $arrondissement = null): float
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('sum(r.nbInscrits) as nbInscrits', 'sum(r.nbVotants) as nbVotants')
+        ;
+
+        if ($arrondissement !== null) {
+            $qb->andWhere('r.arrondissement = :arrondissement')->setParameter('arrondissement', $arrondissement);
+        }
+
+        $result = $qb->getQuery()->getResult();
+
+        return round($result[0]['nbVotants'] * 100 / $result[0]['nbInscrits'], 2);
+    }
+
+    public function tauxVotesNuls(): float
+    {
+        $result = $this->createQueryBuilder('r')
+            ->select('sum(r.nbBulletinsNuls) as nbBulletinsNuls', 'sum(r.nbVotants) as nbVotants')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return round($result[0]['nbBulletinsNuls'] * 100 / $result[0]['nbVotants'], 2);
+    }
+
+    public function nbInscritsEtVotantsParArrondissement(Arrondissement $arrondissement): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('sum(r.nbInscrits) as nbInscrits', 'sum(r.nbVotants) as nbVotants')
+            ->andWhere('r.arrondissement = :arrondissement')
+            ->setParameter('arrondissement', $arrondissement)
+        ;
+
+        $result = $qb->getQuery()->getResult();
+
+        return [
+            'nbVotants' => $result[0]['nbVotants'] ?? 0,
+            'nbInscrits' => $result[0]['nbInscrits'] ?? 0,
+        ];
     }
 
 //    /**

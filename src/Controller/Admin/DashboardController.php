@@ -11,6 +11,7 @@ use App\Entity\Departement;
 use App\Entity\Scrutin;
 use App\Entity\SuperviseurArrondissement;
 use App\Repository\ArrondissementRepository;
+use App\Repository\CirconscriptionRepository;
 use App\Repository\ResultatParArrondissementRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -27,6 +28,7 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly ArrondissementRepository $arrondissementRepository,
+        private readonly CirconscriptionRepository $circonscriptionRepository,
         private readonly ResultatParArrondissementRepository $resultatParArrondissementRepository,
     ) {
     }
@@ -34,9 +36,22 @@ class DashboardController extends AbstractDashboardController
     #[Route('/', name: 'index')]
     public function index(): Response
     {
+        $circonscriptions = $this->circonscriptionRepository->findBy([], ['nom' => 'ASC']);
+        $circonscriptionsData = [];
+        foreach ($circonscriptions as $circonscription) {
+            $circonscriptionsData[] = [
+                'circonscription' => $circonscription,
+                'tauxDepouillement' => $this->tauxDepouillement($circonscription),
+                'tauxParticipation' => $this->tauxParticipation($circonscription),
+            ];
+        }
         return $this->render('admin/dashboard.html.twig', [
             'taux_remontes' => $this->tauxRemontesData(),
+            'taux_participation_national' => $this->resultatParArrondissementRepository->tauxParticipationNational(),
+            'taux_votes_nuls' => $this->resultatParArrondissementRepository->tauxVotesNuls(),
+            'taux_depouillement' => $this->tauxDepouillement(),
             'nb_remontes' => $this->nbRemontesData(),
+            'circonscriptionsData' => $circonscriptionsData,
         ]);
     }
 
@@ -84,6 +99,27 @@ class DashboardController extends AbstractDashboardController
 
     private function tauxRemontesData(): array
     {
+        $circonscriptions = $this->circonscriptionRepository->findBy([], ['nom' => 'ASC']);
+
+        $data = [];
+
+        foreach ($circonscriptions as $circonscription) {
+            $data[$circonscription->getNom()] = $this->tauxDepouillement($circonscription);
+        }
+
+        return [
+            'xAxis' => array_keys($data),
+            'datasets' => [
+                [
+                    'label' => 'Taux de remontée (en %)',
+                    'data' => array_values($data)
+                ]
+            ],
+        ];
+    }
+
+    private function tauxRemontesData2(): array
+    {
         $all = $this->arrondissementRepository->countAllByDepartement();
         $remontes = $this->arrondissementRepository->countAllRemontesByDepartement();
 
@@ -97,7 +133,7 @@ class DashboardController extends AbstractDashboardController
             'xAxis' => array_keys($data),
             'datasets' => [
                 [
-                    'label' => 'Taux de remontée',
+                    'label' => 'Taux de remontée (en %)',
                     'data' => array_values($data)
                 ]
             ],
@@ -105,6 +141,43 @@ class DashboardController extends AbstractDashboardController
     }
 
     private function nbRemontesData(): array
+    {
+
+        $circonscriptions = $this->circonscriptionRepository->findBy([], ['nom' => 'ASC']);
+
+        $all = [];
+        $data = [];
+
+        foreach ($circonscriptions as $circonscription) {
+            $arrondissements = $circonscription->getArrondissements();
+
+            $nbRem = 0;
+
+            foreach ($arrondissements as $arrondissement) {
+                if ($arrondissement->getEstRemonte()) {
+                    $nbRem++;
+                }
+            }
+            $all[$circonscription->getNom()] = sizeof($arrondissements);
+            $data[$circonscription->getNom()] = $nbRem;
+        }
+
+        return [
+            'xAxis' => array_keys($data),
+            'datasets' => [
+                [
+                    'label' => 'Total',
+                    'data' => array_values($all)
+                ],
+                [
+                    'label' => 'Nombre remonté',
+                    'data' => array_values($data)
+                ],
+            ],
+        ];
+    }
+
+    private function nbRemontesData2(): array
     {
         $all = $this->arrondissementRepository->countAllByDepartement();
         $remontes = $this->arrondissementRepository->countAllRemontesByDepartement();
@@ -128,5 +201,43 @@ class DashboardController extends AbstractDashboardController
                 ],
             ],
         ];
+    }
+
+    private function tauxDepouillement(?Circonscription $circonscription = null): float
+    {
+        if ($circonscription === null) {
+            $nbArr = $this->arrondissementRepository->count([]);
+            $nbRem = $this->arrondissementRepository->count(['estRemonte' => true]);
+        } else {
+            $arrondissements = $circonscription->getArrondissements();
+
+            $nbRem = 0;
+
+            foreach ($arrondissements as $arrondissement) {
+                if ($arrondissement->getEstRemonte()) {
+                    $nbRem++;
+                }
+            }
+
+            $nbArr = sizeof($arrondissements);
+        }
+
+        return $nbArr === 0 ? 0 : round($nbRem * 100 / $nbArr, 2);
+    }
+
+    private function tauxParticipation(Circonscription $circonscription): float
+    {
+        $arrondissements = $circonscription->getArrondissements();
+
+        $nbVotTotal = $nbInsTotal = 0;
+
+        foreach ($arrondissements as $arrondissement) {
+            $nbInscritsEtVotantsParArrondissement = $this->resultatParArrondissementRepository->nbInscritsEtVotantsParArrondissement($arrondissement);
+
+            $nbVotTotal += $nbInscritsEtVotantsParArrondissement['nbVotants'];
+            $nbInsTotal += $nbInscritsEtVotantsParArrondissement['nbInscrits'];
+        }
+
+        return $nbInsTotal === 0 ? 0 : round($nbVotTotal * 100 / $nbInsTotal, 2);
     }
 }

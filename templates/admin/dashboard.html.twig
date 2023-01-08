@@ -7,9 +7,58 @@
 {% endblock %}
 
 {% block main %}
-{#    {{ dump(taux_remontes.xAxis, taux_remontes.values) }}#}
+
+    {% set bg_color_participation = 'danger' %}
+    {% set bg_color_votes_nuls = 'success' %}
+    {% set bg_color_depouillement = 'danger' %}
+
+    {% if taux_participation_national >= 30 and taux_participation_national <= 50 %}
+    {% set bg_color_participation = 'warning' %}
+    {% elseif taux_participation_national > 50 %}
+    {% set bg_color_participation = 'success' %}
+    {% endif %}
+
+    {% if taux_votes_nuls >= 30 and taux_votes_nuls <= 50 %}
+    {% set bg_color_votes_nuls = 'warning' %}
+    {% elseif taux_votes_nuls > 50 %}
+    {% set bg_color_votes_nuls = 'danger' %}
+    {% endif %}
+
+    {% if taux_depouillement >= 30 and taux_depouillement <= 50 %}
+    {% set bg_color_depouillement = 'warning' %}
+    {% elseif taux_depouillement > 50 %}
+    {% set bg_color_depouillement = 'success' %}
+    {% endif %}
+
     <div class="row mb-5">
-        <div class="col-6 text-center">
+        <div class="col-4 text-center">
+            <div class="card bg-{{ bg_color_participation }}">
+                <div class="card-body">
+                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de participation</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_participation_national|number_format(2, ',', ' ') }} %</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 text-center">
+            <div class="card bg-{{ bg_color_votes_nuls }}">
+                <div class="card-body">
+                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de bulletins nuls</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_votes_nuls|number_format(2, ',', ' ') }} %</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 text-center">
+            <div class="card bg-{{ bg_color_depouillement }}">
+                <div class="card-body">
+                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de dépouillement</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_depouillement|number_format(2, ',', ' ') }} %</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-9 text-center">
             <div class="card">
                 <div class="card-body">
                     <canvas
@@ -22,18 +71,50 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 text-center">
+    </div>
+    <div class="row mb-5">
+        <div class="col-9 text-center">
             <div class="card">
                 <div class="card-body">
                     <canvas
                             {{ stimulus_controller('render-chart', {
                                 chartData: taux_remontes,
                                 chartTitle: "Taux de remontée par département",
-                                chartType: "line",
+                                chartType: "bar",
                             }) }}
                     ></canvas>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="row mb-5">
+        {% for item in circonscriptionsData %}
+            <div class="col-3 mb-3">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <div class="card-title text-black fw-bold">{{ item.circonscription.nom }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-6 text-center">
+                                <div class="card-text fw-bold text-purple" style="font-size: 20px">{{ item.tauxParticipation|number_format(2, ',', ' ') }} %</div>
+                                <div class="card-text">Participation</div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="card-text fw-bold text-info" style="font-size: 20px">{{ item.tauxDepouillement|number_format(2, ',', ' ') }} %</div>
+                                <div class="card-text">Dépouillement</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div class="card-title text-success">
+                            {{ item.circonscription.siege }}
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
