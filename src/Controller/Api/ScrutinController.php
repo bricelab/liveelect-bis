@@ -85,15 +85,15 @@ class ScrutinController extends AbstractController
         }
 
         $candidats = $this->candidatRepository->findBy(['scrutin' => $scrutin]);
-        $total = $nuls;
+//        $total = $nuls;
+//
+//        foreach ($candidats as $candidat) {
+//            $total += $suffrages[$candidat->getId()];
+//        }
 
-        foreach ($candidats as $candidat) {
-            $total += $suffrages[$candidat->getId()];
-        }
-
-        if ($votants !== $total) {
-            throw new BadInputException('Les résultats sont erronés');
-        }
+//        if ($votants !== $total) {
+//            throw new BadInputException('Les résultats sont erronés');
+//        }
 
         $donneesRemontees = new ResultatParArrondissement();
         $donneesRemontees
