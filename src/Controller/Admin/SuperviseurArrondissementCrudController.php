@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -41,11 +42,20 @@ class SuperviseurArrondissementCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        $roles = [
+            'ROLE_SUPERVISEUR_ARRONDISSEMENT',
+        ];
         yield IdField::new('id', 'ID')->hideOnForm();
         yield AssociationField::new('scrutin', 'Scrutin')->setPermission('ROLE_SUPER_ADMIN');
         yield TelephoneField::new('telephone', 'Téléphone');
         yield TextField::new('nom', 'Nom');
         yield TextField::new('prenoms', 'Prénoms');
+        yield ChoiceField::new('roles', 'Roles')
+            ->renderAsBadges()
+            ->renderExpanded()
+            ->setChoices(array_combine($roles, $roles))
+            ->allowMultipleChoices()
+        ;
     }
 
     public function configureFilters(Filters $filters): Filters
