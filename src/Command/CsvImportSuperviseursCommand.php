@@ -81,6 +81,7 @@ class CsvImportSuperviseursCommand extends Command
                 $superviseur1->setScrutin($scrutin);
                 $superviseur1->setRoles(['ROLE_SUPERVISEUR_ARRONDISSEMENT']);
                 $this->em->persist($superviseur1);
+                $this->em->flush();
                 $cpt++;
             }
 
@@ -96,6 +97,7 @@ class CsvImportSuperviseursCommand extends Command
                 $superviseur2->setScrutin($scrutin);
                 $superviseur2->setRoles(['ROLE_SUPERVISEUR_ARRONDISSEMENT']);
                 $this->em->persist($superviseur2);
+                $this->em->flush();
                 $cpt++;
             }
             $this->em->flush();
