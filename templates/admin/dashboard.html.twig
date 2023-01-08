@@ -38,45 +38,47 @@
         <div class="col-4 text-center">
             <div class="card bg-{{ bg_color_participation }}">
                 <div class="card-body">
-                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de participation</div>
-                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_participation_national|number_format(2, ',', ' ') }} %</div>
+                    <div class="card-title text-uppercase" style="font-size: 12px">Taux de participation</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 20px">{{ taux_participation_national|number_format(2, ',', ' ') }} %</div>
                 </div>
             </div>
         </div>
         <div class="col-4 text-center">
             <div class="card bg-{{ bg_color_votes_nuls }}">
                 <div class="card-body">
-                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de bulletins nuls</div>
-                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_votes_nuls|number_format(2, ',', ' ') }} %</div>
+                    <div class="card-title text-uppercase" style="font-size: 12px">Taux de bulletins nuls</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 20px">{{ taux_votes_nuls|number_format(2, ',', ' ') }} %</div>
                 </div>
             </div>
         </div>
         <div class="col-4 text-center">
             <div class="card bg-{{ bg_color_depouillement }}">
                 <div class="card-body">
-                    <div class="card-title text-uppercase" style="font-size: 20px">Taux de dépouillement</div>
-                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ taux_depouillement|number_format(2, ',', ' ') }} %</div>
+                    <div class="card-title text-uppercase" style="font-size: 12px">Taux de dépouillement</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 20px">{{ taux_depouillement|number_format(2, ',', ' ') }} %</div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row mb-5">
-        <div class="col-6 text-center">
+        <div class="col-3 text-center"></div>
+        <div class="col-3 text-center">
             <div class="card bg-success">
                 <div class="card-body">
-                    <div class="card-title text-uppercase" style="font-size: 20px">Arrondissements remontés</div>
-                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ arrondissements_remontes|number_format(0, ',', ' ') }} </div>
+                    <div class="card-title text-uppercase" style="font-size: 12px">Arrondissements remontés</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 20px">{{ arrondissements_remontes|number_format(0, ',', ' ') }} </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 text-center">
+        <div class="col-3 text-center">
             <div class="card bg-warning">
                 <div class="card-body">
-                    <div class="card-title text-uppercase" style="font-size: 20px">Arrondissements restants</div>
-                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ arrondissements_restants|number_format(0, ',', ' ') }} </div>
+                    <div class="card-title text-uppercase" style="font-size: 12px">Arrondissements restants</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 20px">{{ arrondissements_restants|number_format(0, ',', ' ') }} </div>
                 </div>
             </div>
         </div>
+        <div class="col-3 text-center"></div>
     </div>
 
     <div class="row mb-5">
