@@ -60,6 +60,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mb-5">
         <div class="col-3 text-center"></div>
         <div class="col-3 text-center">
@@ -129,6 +130,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mb-5">
         <div class="col-8 text-center">
             <div class="card">
@@ -162,6 +164,16 @@
                                 <div class="card-text fw-bold text-info" style="font-size: 20px">{{ item.tauxDepouillement|number_format(2, ',', ' ') }} %</div>
                                 <div class="card-text">Dépouillement</div>
                             </div>
+                        </div>
+                        <div class="row mb-3">
+                            {% for percent in item.tauxCandidats %}
+                            <div class="col-6 mb-5">
+                                <div class="card-text fw-bold text-dark" style="font-size: 12px">
+                                    <img class="mr-3" src="/uploads/candidats/logos/{{ percent.logo }}" alt="{{ percent.sigle }}" width="25">
+                                    {{ percent.taux|number_format(2, ',', ' ') }}%
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="card-footer text-right">

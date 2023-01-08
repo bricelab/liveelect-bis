@@ -44,10 +44,22 @@ class DashboardController extends AbstractDashboardController
         foreach ($circonscriptions as $circonscription) {
 //            dump($circonscription, $this->calculerNbSieges($circonscription, $suffragesNational));
 //            ($this->calculerNbSieges($circonscription, $suffragesNational));
+            $suffragesTotal = $this->suffragesObtenusRepository->suffragesExprimesParCirconscription($circonscription);
+            $suffragesObtenusParCandidat = $this->suffragesObtenusRepository->suffragesObtenusParCandidatParCirconscription($circonscription);
+            $tauxCandidats = [];
+//            dump($suffragesObtenusParCandidat);
+            foreach ($suffragesObtenusParCandidat as $item) {
+                $tauxCandidats[$item['sigle']] = [
+                    'logo' => $item['logo'],
+                    'sigle' => $item['sigle'],
+                    'taux' => $suffragesTotal === 0 ? 0 : $item['suffrages_obtenus'] * 100 / $suffragesTotal,
+                ];
+            }
             $circonscriptionsData[] = [
                 'circonscription' => $circonscription,
                 'tauxDepouillement' => $this->tauxDepouillement($circonscription),
                 'tauxParticipation' => $this->tauxParticipation($circonscription),
+                'tauxCandidats' => $tauxCandidats,
             ];
         }
 //        $suffragesObtenus = $this->suffragesObtenusRepository->suffragesObtenusParCandidat();

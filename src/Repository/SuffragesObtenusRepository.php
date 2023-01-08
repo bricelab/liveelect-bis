@@ -73,7 +73,7 @@ SQL;
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = <<<SQL
-            SELECT c.id, c.sigle, sum(nb_voix) as suffrages_obtenus
+            SELECT c.*, sum(nb_voix) as suffrages_obtenus
 FROM `suffrages_obtenus` s
 JOIN `resultat_par_arrondissement` r 
 JOIN `arrondissement` a 
