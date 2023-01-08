@@ -1,28 +1,27 @@
 <?php
 
-namespace App\Controller\Admin;
+declare(strict_types=1);
+
+namespace App\Service;
 
 use App\Repository\ResultatParArrondissementRepository;
 use App\Repository\SuffragesObtenusRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
-#[Route('/admin', name: 'admin_')]
-class ExportController extends AbstractController
+final class ScrutinDataService
 {
 
     public function __construct(
         private readonly EncoderInterface $encoder,
         private readonly ResultatParArrondissementRepository $resultatParArrondissementRepository,
         private readonly SuffragesObtenusRepository $suffragesObtenusRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
-    #[Route('/export-results', name: 'export_results')]
-    public function exportResults(): Response
+    public function export(): string
     {
         $results = $this->resultatParArrondissementRepository->findBy([]);
         $data = [];
@@ -49,7 +48,25 @@ class ExportController extends AbstractController
         $filename = 'export_resultats_scrutin.csv';
 
         file_put_contents($filename, $this->encoder->encode($data, 'csv', [CsvEncoder::DELIMITER_KEY => ';']));
+        return $filename;
+    }
 
-        return $this->file($filename);
+    public function purgeData(): void
+    {
+        $results = $this->resultatParArrondissementRepository->findBy([]);
+
+        foreach ($results as $result) {
+            $suffrages = $this->suffragesObtenusRepository->findBy(['resultatParArrondissement' => $result]);
+
+            foreach ($suffrages as $suffrage) {
+                $this->entityManager->remove($suffrage);
+            }
+
+            $result->getArrondissement()->setEstRemonte(false);
+
+            $this->entityManager->remove($result);
+        }
+
+        $this->entityManager->flush();
     }
 }

@@ -3,6 +3,9 @@
 {% block page_title %}Live Elect | Tableau de bord{% endblock %}
 {% block content_title %}Tableau de bord{% endblock %}
 {% block page_actions %}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+    <a class="btn btn-danger" href="{{ path('admin_purge_results') }}" onclick="return confirm('Voulez-vous vraiment purger les données ?')">Purger les données</a>
+    {% endif %}
     <a class="btn btn-primary" href="{{ path('admin_export_results') }}">Exporter les données</a>
 {% endblock %}
 

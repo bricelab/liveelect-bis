@@ -52,7 +52,7 @@ class ResultatParArrondissementRepository extends ServiceEntityRepository
 
         $result = $qb->getQuery()->getResult();
 
-        return round($result[0]['nbVotants'] * 100 / $result[0]['nbInscrits'], 2);
+        return intval($result[0]['nbInscrits']) === 0 ? 0 : round($result[0]['nbVotants'] * 100 / $result[0]['nbInscrits'], 2);
     }
 
     public function tauxVotesNuls(): float
@@ -63,7 +63,7 @@ class ResultatParArrondissementRepository extends ServiceEntityRepository
             ->getResult()
         ;
 
-        return round($result[0]['nbBulletinsNuls'] * 100 / $result[0]['nbVotants'], 2);
+        return intval($result[0]['nbVotants']) === 0 ? 0 : round($result[0]['nbBulletinsNuls'] * 100 / $result[0]['nbVotants'], 2);
     }
 
     public function nbInscritsEtVotantsParArrondissement(Arrondissement $arrondissement): array
@@ -81,29 +81,4 @@ class ResultatParArrondissementRepository extends ServiceEntityRepository
             'nbInscrits' => $result[0]['nbInscrits'] ?? 0,
         ];
     }
-
-//    /**
-//     * @return ResultatParArrondissement[] Returns an array of ResultatParArrondissement objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?ResultatParArrondissement
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
