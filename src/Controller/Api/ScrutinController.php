@@ -91,7 +91,7 @@ class ScrutinController extends AbstractController
             $total += $suffrages[$candidat->getId()];
         }
 
-        if ($inscrits < $votants || $votants !== $total) {
+        if ($votants !== $total) {
             throw new BadInputException('Les résultats sont erronés');
         }
 
