@@ -113,6 +113,31 @@ SQL;
         return intval($resultSet->fetchAllAssociative()[0]['suffrages_exprimes']);
     }
 
+    /**
+     * @throws Exception
+     */
+    public function suffragesObtenusParCandidat(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = <<<SQL
+            SELECT c.*, sum(nb_voix) as suffrages_obtenus
+FROM `suffrages_obtenus` s
+JOIN `resultat_par_arrondissement` r 
+JOIN `arrondissement` a 
+JOIN `circonscription_arrondissement` ca 
+JOIN `circonscription` ci 
+JOIN `candidat` c 
+ON s.resultat_par_arrondissement_id = r.id AND r.arrondissement_id = a.id AND a.id = ca.arrondissement_id AND ca.circonscription_id = ci.id AND s.candidat_id = c.id
+WHERE a.est_remonte = 1
+GROUP BY c.id
+SQL;
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery([]);
+
+        return $resultSet->fetchAllAssociative();
+    }
+
 //    public function findOneBySomeField($value): ?SuffragesObtenus
 //    {
 //        return $this->createQueryBuilder('s')

@@ -80,7 +80,7 @@
     </div>
 
     <div class="row mb-5">
-        <div class="col-9 text-center">
+        <div class="col-8 text-center ">
             <div class="card">
                 <div class="card-body">
                     <canvas
@@ -93,9 +93,42 @@
                 </div>
             </div>
         </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body ">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="text-info text-center">
+                                <th>Candidats</th>
+                                <th>Voix</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in suffrages_obtenus %}
+                            <tr>
+                                <td class="p-3">
+                                    <img class="mr-3" src="/uploads/candidats/logos/{{ item.logo }}" alt="{{ item.sigle }}" width="25">
+                                    {{ item.sigle }}
+                                </td>
+                                <td class="text-center fw-bold">{{ item.suffrages_obtenus }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                        <tfoot>
+                            <tr class="text-info text-center">
+                                <th>Candidats</th>
+                                <th>Voix</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row mb-5">
-        <div class="col-9 text-center">
+        <div class="col-8 text-center">
             <div class="card">
                 <div class="card-body">
                     <canvas

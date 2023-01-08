@@ -40,15 +40,19 @@ class DashboardController extends AbstractDashboardController
     {
         $circonscriptions = $this->circonscriptionRepository->findBy([], ['nom' => 'ASC']);
         $circonscriptionsData = [];
-        $suffragesNational = $this->suffragesObtenusRepository->suffragesExprimesNational();
+//        $suffragesNational = $this->suffragesObtenusRepository->suffragesExprimesNational();
         foreach ($circonscriptions as $circonscription) {
 //            dump($circonscription, $this->calculerNbSieges($circonscription, $suffragesNational));
+//            ($this->calculerNbSieges($circonscription, $suffragesNational));
             $circonscriptionsData[] = [
                 'circonscription' => $circonscription,
                 'tauxDepouillement' => $this->tauxDepouillement($circonscription),
                 'tauxParticipation' => $this->tauxParticipation($circonscription),
             ];
         }
+//        $suffragesObtenus = $this->suffragesObtenusRepository->suffragesObtenusParCandidat();
+//        dd($suffragesObtenus);
+
         return $this->render('admin/dashboard.html.twig', [
             'taux_remontes' => $this->tauxRemontesData(),
             'taux_participation_national' => $this->resultatParArrondissementRepository->tauxParticipationNational(),
@@ -58,6 +62,7 @@ class DashboardController extends AbstractDashboardController
             'circonscriptionsData' => $circonscriptionsData,
             'arrondissements_restants' => $this->arrondissementRepository->count(['estRemonte' => false]),
             'arrondissements_remontes' => $this->arrondissementRepository->count(['estRemonte' => true]),
+            'suffrages_obtenus' => $this->suffragesObtenusRepository->suffragesObtenusParCandidat(),
         ]);
     }
 
@@ -66,7 +71,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Elect Manager');
+            ->setTitle('Live Elect Bis')->renderSidebarMinimized();
     }
 
    public function configureActions(): Actions
@@ -81,7 +86,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Accueil', 'fa fa-home');
+        yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-tachometer');
 
         yield MenuItem::section('Données du scrutin');
         yield MenuItem::linkToCrud('Scrutins', 'fas fa-list', Scrutin::class)->setPermission('ROLE_SUPER_ADMIN');
@@ -247,44 +252,48 @@ class DashboardController extends AbstractDashboardController
         return $nbInsTotal === 0 ? 0 : round($nbVotTotal * 100 / $nbInsTotal, 2);
     }
 
-//    private function calculerNbSieges(Circonscription $circonscription, int $suffragesNational): array
-//    {
-//        $suffragesExprimes = $this->suffragesObtenusRepository->suffragesExprimesParCirconscription($circonscription);
-//        $suffragesObtenus = $this->suffragesObtenusRepository->suffragesObtenusParCandidatParCirconscription($circonscription);
-//
-//        $quotientElectoral = $suffragesExprimes / $circonscription->getSiege();
-//        $siegesObtenus = [];
-//        foreach ($suffragesObtenus as $suffragesObtenu) {
-//            $tauxNational = $suffragesNational === 0 ? 0 : round($suffragesObtenu['suffrages_obtenus'] * 100 / $suffragesNational, 2);
-//            if ($tauxNational >= 10.) {
-//                $siegesObtenus[($suffragesObtenu['sigle'])] = intval($suffragesObtenu['suffrages_obtenus'] / $quotientElectoral);
-//            }
-//        }
-//
-////        dump($suffragesObtenus, $siegesObtenus);
-//
-////        do {
-//            $siegeRestant = $circonscription->getSiege() - array_reduce($siegesObtenus, function ($acc, $siege) {
-//                return $acc + $siege;
-//            });
-//
-//            if($siegeRestant > 0) {
-//                $quotients = [];
-//                foreach ($suffragesObtenus as $suffragesObtenu) {
-//                    $tauxNational = $suffragesNational === 0 ? 0 : round($suffragesObtenu['suffrages_obtenus'] * 100 / $suffragesNational, 2);
-//                    if ($tauxNational >= 10.) {
-////                        dump($siegeRestant);
-//                        $quotients[($suffragesObtenu['sigle'])] = isset($siegesObtenus[$suffragesObtenu['sigle']]) && $siegesObtenus[$suffragesObtenu['sigle']] !== 0 ?
-//                            ($suffragesObtenu['suffrages_obtenus'] / $siegesObtenus[$suffragesObtenu['sigle']]) + 1 : 0;
-//                    }
-//                }
-//                asort($quotients);
-//                $candidatIds = array_keys($quotients);
-//                $cid = array_pop($candidatIds);
-//                $siegesObtenus[$cid]++;
-//            }
-////        }while($siegeRestant > 0);
-//
-//        return $siegesObtenus;
-//    }
+    private function calculerNbSieges(Circonscription $circonscription, int $suffragesNational): array
+    {
+        $suffragesExprimes = $this->suffragesObtenusRepository->suffragesExprimesParCirconscription($circonscription);
+        $suffragesObtenus = $this->suffragesObtenusRepository->suffragesObtenusParCandidatParCirconscription($circonscription);
+
+        $quotientElectoral = $suffragesExprimes / $circonscription->getSiege();
+        $siegesObtenus = [];
+        foreach ($suffragesObtenus as $suffragesObtenu) {
+            $tauxNational = $suffragesNational === 0 ? 0 : round($suffragesObtenu['suffrages_obtenus'] * 100 / $suffragesNational, 2);
+            if ($tauxNational >= 10.) {
+                $siegesObtenus[($suffragesObtenu['sigle'])] = intval($suffragesObtenu['suffrages_obtenus'] / $quotientElectoral);
+            }
+        }
+
+//        dump($suffragesObtenus, $siegesObtenus);
+
+//        do {
+            $siegeRestant = $circonscription->getSiege() - array_reduce($siegesObtenus, function ($acc, $siege) {
+                return $acc + $siege;
+            });
+
+            if($siegeRestant > 0) {
+                $quotients = [];
+                foreach ($suffragesObtenus as $suffragesObtenu) {
+                    $tauxNational = $suffragesNational === 0 ? 0 : round($suffragesObtenu['suffrages_obtenus'] * 100 / $suffragesNational, 2);
+                    if ($tauxNational >= 10.) {
+//                        dump($siegeRestant);
+                        $quotients[($suffragesObtenu['sigle'])] = isset($siegesObtenus[$suffragesObtenu['sigle']]) && $siegesObtenus[$suffragesObtenu['sigle']] !== 0 ?
+                            ($suffragesObtenu['suffrages_obtenus'] / $siegesObtenus[$suffragesObtenu['sigle']]) + 1 : 0;
+                    }
+                }
+                asort($quotients);
+                $candidatIds = array_keys($quotients);
+                if (sizeof($candidatIds) > 0) {
+                    $cid = array_pop($candidatIds);
+                    dump($circonscription, $candidatIds, $cid);
+//                    $siegesObtenus[$cid]++;
+                }
+
+            }
+//        }while($siegeRestant > 0);
+
+        return $siegesObtenus;
+    }
 }
