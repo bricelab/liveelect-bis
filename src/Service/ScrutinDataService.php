@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Repository\ArrondissementRepository;
 use App\Repository\CirconscriptionRepository;
 use App\Repository\ResultatParArrondissementRepository;
 use App\Repository\SuffragesObtenusRepository;
@@ -19,6 +20,7 @@ final class ScrutinDataService
         private readonly CirconscriptionRepository $circonscriptionRepository,
         private readonly ResultatParArrondissementRepository $resultatParArrondissementRepository,
         private readonly SuffragesObtenusRepository $suffragesObtenusRepository,
+        private readonly ArrondissementRepository $arrondissementRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
     }
@@ -50,6 +52,28 @@ final class ScrutinDataService
         $filename = 'export_resultats_scrutin.csv';
 
         file_put_contents($filename, $this->encoder->encode($data, 'csv', [CsvEncoder::DELIMITER_KEY => ';']));
+        return $filename;
+    }
+
+    public function exportArrondissements(bool $estRemonte = false): string
+    {
+        $arrondissements = $this->arrondissementRepository->findBy(['estRemonte' => $estRemonte]);
+        $data = [];
+        $cpt = 1;
+
+        foreach ($arrondissements as $arrondissement) {
+            $data[] = [
+                '#' => $cpt++,
+                'Département' => $arrondissement->getCommune()->getDepartement()->getNom(),
+                'Commune' => $arrondissement->getCommune()->getNom(),
+                'Arrondissement' => $arrondissement->getNom(),
+            ];
+        }
+
+        $filename = 'export_arrondissements.csv';
+
+        file_put_contents($filename, $this->encoder->encode($data, 'csv', [CsvEncoder::DELIMITER_KEY => ';']));
+
         return $filename;
     }
 

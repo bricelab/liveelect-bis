@@ -4,9 +4,11 @@
 {% block content_title %}Tableau de bord{% endblock %}
 {% block page_actions %}
     {% if is_granted('ROLE_SUPER_ADMIN') %}
-    <a class="btn btn-danger" href="{{ path('admin_purge_results') }}" onclick="return confirm('Voulez-vous vraiment purger les données ?')">Purger les données</a>
+{#    <a class="btn btn-danger" href="{{ path('admin_purge_results') }}" onclick="return confirm('Voulez-vous vraiment purger les données ?')">Purger les données</a>#}
     {% endif %}
-    <a class="btn btn-primary" href="{{ path('admin_export_results_par_ce') }}">Exporter avec CE</a>
+    <a class="btn btn-success" href="{{ path('admin_export_arrondissements_remontes') }}">Arrondissements remontés</a>
+    <a class="btn btn-warning" href="{{ path('admin_export_arrondissements_non_remontes') }}">Arrondissements restants</a>
+    <a class="btn btn-secondary" href="{{ path('admin_export_results_par_ce') }}">Exporter avec CE</a>
     <a class="btn btn-primary" href="{{ path('admin_export_results') }}">Exporter les données</a>
 {% endblock %}
 
