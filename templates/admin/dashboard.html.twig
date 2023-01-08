@@ -59,6 +59,24 @@
             </div>
         </div>
     </div>
+    <div class="row mb-5">
+        <div class="col-6 text-center">
+            <div class="card bg-success">
+                <div class="card-body">
+                    <div class="card-title text-uppercase" style="font-size: 20px">Arrondissements remontés</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ arrondissements_remontes|number_format(0, ',', ' ') }} </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 text-center">
+            <div class="card bg-warning">
+                <div class="card-body">
+                    <div class="card-title text-uppercase" style="font-size: 20px">Arrondissements restants</div>
+                    <div class="card-text fw-bold text-white" style="font-size: 50px">{{ arrondissements_restants|number_format(0, ',', ' ') }} </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row mb-5">
         <div class="col-9 text-center">
