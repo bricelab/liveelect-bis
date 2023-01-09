@@ -84,7 +84,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Live Elect Bis')->renderSidebarMinimized();
+            ->setTitle('Live Elect Bis')->renderSidebarMinimized()->renderContentMaximized(true);
     }
 
    public function configureActions(): Actions
