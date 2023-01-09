@@ -189,3 +189,13 @@
         {% endfor %}
     </div>
 {% endblock %}
+
+{% block body_javascript %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setInterval(() => {
+                window.location.reload()
+            }, 60000)
+        })
+    </script>
+{% endblock body_javascript %}
